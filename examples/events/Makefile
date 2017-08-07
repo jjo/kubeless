@@ -22,7 +22,9 @@ $(FUNCNAME)-verify:
 	kubectl get pod -l function=$(FUNCNAME)
 	kubectl get namespace events-test-foobar 2>/dev/null || \
 	  kubectl create namespace events-test-foobar
-	$(MAKE) $(FUNCNAME)-logs |grep events-test-foobar
+	-$(MAKE) $(FUNCNAME)-logs |grep events-test-foobar
+	echo "XXX jjo-FIX XXX"
+	$(MAKE) $(FUNCNAME)-logs
 	
 clean:
 	-kubeless function delete $(FUNCNAME)
