@@ -90,7 +90,7 @@ k8s_wait_for_pod_gone() {
 k8s_wait_for_pod_logline() {
     local string="${1:?}"; shift
     info "Waiting for '${@}' to show logline '${string}' ..."
-    until kubectl logs --tail=10 "${@}"|&grep -q "${string}"; do
+    until kubectl logs --tail=10 "${@}"|&egrep -q "${string}"; do
         spin 0.5
     done
     pass_or_fail $? 0 "Found logline: '$string'"

@@ -7,10 +7,18 @@ source ${DIR}/libtest.sh || exit 1
 
 FUNCTIONS=(get-python get-nodejs post-python post-nodejs pubsub-python)
 
+_wait_for_kafka_ready() {
+    info "Waiting for kafka-0 to be ready ..."
+    k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
+}
+
 test_reset ${TEST_CONTEXT}
 k8s_context_save
 for func in ${FUNCTIONS[*]}; do
     echo "TEST: $func"
+    case "${func}" in
+        pubsub-*) _wait_for_kafka_ready;;
+    esac
     kubeless_function_delete ${func}
     make -sC examples ${func}
     k8s_wait_for_pod_ready -l function=${func}
