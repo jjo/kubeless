@@ -36,3 +36,7 @@ pubsub:
 
 topic:
 	kubeless function publish --topic demo --data "s3"
+
+pubsub-python pubsub-python-verify:
+	$(MAKE) -C events $@
+

@@ -5,7 +5,7 @@ TEST_CONTEXT=${1:?missing k8s context, e.g.: minikube}
 DIR=${0%/*}
 source ${DIR}/libtest.sh || exit 1
 
-FUNCTIONS=(get-python get-nodejs post-python post-nodejs)
+FUNCTIONS=(get-python get-nodejs post-python post-nodejs pubsub-python)
 
 test_reset ${TEST_CONTEXT}
 k8s_context_save

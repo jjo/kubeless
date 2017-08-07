@@ -1,0 +1,16 @@
+# In RBAC mode, the systemaccount running below pods needs to
+# be able to watch k8s events
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: skippbox-k8s-events
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: skippbox-k8s-events
+    spec:
+      containers:
+      - image: skippbox/k8s-events:0.10.12
+        name: skipbox-k8s-events
