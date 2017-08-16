@@ -71,5 +71,6 @@ if [ ${exit_code} -ne 0 -o -n "${TRAVIS_DUMP_LOGS}" ]; then
     kubectl logs -n kube-system -l k8s-app=kube-dns -c kubedns
     echo "INFO: LOGs: END"
 fi
+[ ${exit_code} -eq 0 ] && echo "INFO: $0: SUCCESS" || "ERROR: $0: FAILED"
 exit ${exit_code}
 # vim: sw=4 ts=4 et si
