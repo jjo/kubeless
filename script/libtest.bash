@@ -132,6 +132,7 @@ _wait_for_kubeless_controller_logline() {
 _wait_for_kubeless_kafka_ready() {
     echo_info "Waiting for kafka-0 to be ready ..."
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
+    k8s_wait_for_pod_logline "Stabilized.group.pubsubhandler" -n kubeless kafka-0
 }
 _wait_for_simple_function_pod_ready() {
     k8s_wait_for_pod_ready -l function=get-python
