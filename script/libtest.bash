@@ -130,8 +130,12 @@ _wait_for_kubeless_controller_logline() {
     k8s_wait_for_pod_logline "${string}" -n kubeless -l kubeless=controller
 }
 _wait_for_kubeless_kafka_server_ready() {
+    local test_topic=test-centinel
     echo_info "Waiting for kafka-0 to be ready ..."
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
+    sleep 10
+    kubeless topic create "${test_topic}"
+    k8s_wait_for_pod_logline "Completed.load.of.log.${test_topic}-" -n kubeless kafka-0
 }
 _wait_for_kubeless_kafka_topic_ready() {
     local func=${1:?} func_topic
