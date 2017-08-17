@@ -134,8 +134,10 @@ _wait_for_kubeless_kafka_server_ready() {
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
 }
 _wait_for_kubeless_kafka_topic_ready() {
-    echo_info "Waiting for kafka-0 topic to be loaded ..."
-    k8s_wait_for_pod_logline "Completed.load.of.log" -n kubeless kafka-0
+    local func=${1:?} func_topic
+    func_topic=$(kubeless function describe "${func}" -o yaml|sed -n 's/^topic: //p')
+    echo_info "Waiting for kafka-0 topic='${func_topic}' to be loaded ..."
+    k8s_wait_for_pod_logline "Completed.load.of.log.${func_topic}-" -n kubeless kafka-0
 }
 _wait_for_simple_function_pod_ready() {
     k8s_wait_for_pod_ready -l function=get-python
@@ -204,7 +206,7 @@ test_kubeless_function() {
     make -sC examples ${func}
     k8s_wait_for_pod_ready -l function=${func}
     case "${func}" in
-        *pubsub*) _wait_for_kubeless_kafka_topic_ready;;
+        *pubsub*) _wait_for_kubeless_kafka_topic_ready ${func};;
     esac
     make -sC examples ${func}-verify
 }
