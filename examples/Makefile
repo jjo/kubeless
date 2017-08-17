@@ -43,4 +43,4 @@ pubsub:
 
 pubsub-verify:
 	kubeless topic publish --topic s3 --data "s3"
-	kubectl logs $(shell kubectl get po -oname| grep pubsub) |egrep "s3"
+	for i in $(shell seq 1 10); do echo "$$i ..."; kubectl logs $(shell kubectl get po -oname| grep pubsub) |egrep "s3" && exit 0; sleep 2; done; false
