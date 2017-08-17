@@ -129,10 +129,13 @@ _wait_for_kubeless_controller_logline() {
     local string="${1:?}"
     k8s_wait_for_pod_logline "${string}" -n kubeless -l kubeless=controller
 }
-_wait_for_kubeless_kafka_ready() {
+_wait_for_kubeless_kafka_server_ready() {
     echo_info "Waiting for kafka-0 to be ready ..."
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
-    k8s_wait_for_pod_logline "Stabilized.group.pubsubhandler" -n kubeless kafka-0
+}
+_wait_for_kubeless_kafka_topic_ready() {
+    echo_info "Waiting for kafka-0 topic to be loaded ..."
+    k8s_wait_for_pod_logline "Completed.load.of.log" -n kubeless kafka-0
 }
 _wait_for_simple_function_pod_ready() {
     k8s_wait_for_pod_ready -l function=get-python
@@ -195,10 +198,13 @@ test_kubeless_function() {
     local func=${1:?}
     echo_info "TEST: $func"
     case "${func}" in
-        *pubsub*) _wait_for_kubeless_kafka_ready;;
+        *pubsub*) _wait_for_kubeless_kafka_server_ready;;
     esac
     kubeless_function_delete ${func}
     make -sC examples ${func}
+    case "${func}" in
+        *pubsub*) _wait_for_kubeless_kafka_topic_ready;;
+    esac
     k8s_wait_for_pod_ready -l function=${func}
     make -sC examples ${func}-verify
 }
