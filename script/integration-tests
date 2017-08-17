@@ -45,6 +45,10 @@ kubectl get nodes --context=${INTEGRATION_TESTS_CTX:?} || {
 # add some (granted) broad ones:
 kubectl --context=${INTEGRATION_TESTS_CTX:?} get clusterrolebinding kube-dns-admin >& /dev/null || \
     kubectl --context=${INTEGRATION_TESTS_CTX:?} create clusterrolebinding kube-dns-admin --serviceaccount=kube-system:default --clusterrole=cluster-admin
+kubectl --context=${INTEGRATION_TESTS_CTX} get deployment --namespace=kube-system kube-dns -oyaml| \
+    sed -r 's,(.*--server)=(/ip6.arpa/.*),&\n\1=8.8.8.8,'|\
+    kubectl --context=${INTEGRATION_TESTS_CTX} apply -f -
+
 
 # Prep: load test library, save current k8s default context (and restore it at exit),
 # as kubeless doesn't support --context
