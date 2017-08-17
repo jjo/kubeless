@@ -202,10 +202,10 @@ test_kubeless_function() {
     esac
     kubeless_function_delete ${func}
     make -sC examples ${func}
+    k8s_wait_for_pod_ready -l function=${func}
     case "${func}" in
         *pubsub*) _wait_for_kubeless_kafka_topic_ready;;
     esac
-    k8s_wait_for_pod_ready -l function=${func}
     make -sC examples ${func}-verify
 }
 # vim: sw=4 ts=4 et si
