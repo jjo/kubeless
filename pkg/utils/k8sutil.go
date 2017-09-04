@@ -59,6 +59,7 @@ const (
 	node8Http      = "bitnami/kubeless-nodejs@sha256:1eff2beae6fcc40577ada75624c3e4d3840a854588526cd8616d66f4e889dfe6"
 	node8Pubsub    = "bitnami/kubeless-nodejs-event-consumer@sha256:4d005c9c0b462750d9ab7f1305897e7a01143fe869d3b722ed3330560f9c7fb5"
 	ruby24Http     = "bitnami/kubeless-ruby@sha256:98e95c41652a7a0149421157c2dfb64b31e0d406b8c46c8bc89bd54e50f9898d"
+	ruby24Pubsub   = "bitnami/kubeless-ruby-event-consumer@sha256:cc255fc4268b70757706f70d6329b075004feb943c9e0fb885be7526c1f816af"
 	busybox        = "busybox@sha256:be3c11fdba7cfe299214e46edc642e09514dbb9bbefcd0d3836c05a1e0cd0642"
 	pubsubFunc     = "PubSub"
 	schedFunc      = "Scheduled"
@@ -81,7 +82,7 @@ func init() {
 	node8 := runtimeVersion{runtimeID: "nodejs", version: "8", httpImage: node8Http, pubsubImage: node8Pubsub}
 	node = []runtimeVersion{node6, node8}
 
-	ruby24 := runtimeVersion{runtimeID: "ruby", version: "2.4", httpImage: ruby24Http, pubsubImage: ""}
+	ruby24 := runtimeVersion{runtimeID: "ruby", version: "2.4", httpImage: ruby24Http, pubsubImage: ruby24Pubsub}
 	ruby = []runtimeVersion{ruby24}
 }
 
