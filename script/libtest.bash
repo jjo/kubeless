@@ -144,13 +144,17 @@ _wait_for_kubeless_controller_logline() {
     local string="${1:?}"
     k8s_wait_for_pod_logline "${string}" -n kubeless -l kubeless=controller
 }
+
+KUBELESS_KAFKA_SERVER_READY=""
 _wait_for_kubeless_kafka_server_ready() {
     local test_topic=test-centinel
+    [[ $KUBELESS_KAFKA_SERVER_READY == true ]] && return 0
     echo_info "Waiting for kafka-0 to be ready ..."
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
     sleep 10
-    kubeless topic create "${test_topic}" || true
+    kubeless topic create "${test_topic}"
     _wait_for_kubeless_kafka_topic_ready "${test_topic}"
+    KUBELESS_KAFKA_SERVER_READY=true
 }
 _wait_for_kubeless_kafka_topic_ready() {
     local topic=${1:?}
