@@ -5,9 +5,9 @@ public class mycode
 {
     public int execute(HttpRequest request)
     {
-        var result = DoSomeMath(3,5);
+        var result = DoSomeMath(6, 7);
         return result;
     }
 
-    public int DoSomeMath(int x, int y) => x+y;
+    public int DoSomeMath(int x, int y) => x * y;
 }
