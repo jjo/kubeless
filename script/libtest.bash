@@ -257,8 +257,10 @@ test_kubeless_function() {
 test_kubeless_function_update() {
     local func=${1:?} func_topic
     local cur_pod=$(kubectl get pod -l function=${func} -oname|sed 's,pods/,,')
+    local cur_rs=$(kubectl get rs -l function=${func} -oname|sed 's,replicasets/,,')
     echo_info "UPDATE: $func"
     make -sC examples ${func}-update
+    kubectl delete rs ${cur_rs} || true
     k8s_wait_for_pod_gone ${cur_pod}
     k8s_wait_for_pod_ready -l function=${func}
     make -sC examples ${func}-update-verify
