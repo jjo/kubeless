@@ -256,9 +256,11 @@ test_kubeless_function() {
 
 test_kubeless_function_update() {
     local func=${1:?} func_topic
+    local cur_pod=$(kubectl get pod -l function=${func} -oname|sed 's,pods/,,')
     echo_info "UPDATE: $func"
     make -sC examples ${func}-update
-    k8s_wait_for_uniq_pod -l function=${func}
+    k8s_wait_for_pod_gone ${cur_pod}
+    k8s_wait_for_pod_ready -l function=${func}
     make -sC examples ${func}-update-verify
 }
 # vim: sw=4 ts=4 et si
