@@ -289,17 +289,25 @@ test_kubeless_function_update() {
     verify_update_function $func
 }
 test_kubeless_ingress() {
-    local func=${1:?}
-    kubeless ingress create ing-${func} --function ${func} --hostname ${func}.example.com
+    local func=${1:?} domain=example.com exp_ingress act_ingress
+    echo_info "TEST: ingress ${func}"
+    kubeless ingress create ing-${func} --function ${func} --hostname ${func}.${domain}
     kubeless ingress list | fgrep -w ing-${func}
+    exp_ingress="${func}.${domain}:${func}"
+    act_ingress=$(kubectl get ingress ing-${func} -ojsonpath='{range .spec.rules[*]}{@.host}:{@.http.paths[*].backend.serviceName}')
+    [[ ${act_ingress} == ${exp_ingress} ]]
     kubeless ingress delete ing-${func}
 }
 test_kubeless_autoscale() {
-    local func=${1:?} 
+    local func=${1:?}
     # Use some fixed values
     local val=10 num=3
+    echo_info "TEST: autoscale ${func}"
     kubeless autoscale create ${func} --value ${val:?} --min ${num:?} --max ${num:?}
     kubeless autoscale list | fgrep -w ${func}
+    act_autoscale=$(kubectl get horizontalpodautoscaler -ojsonpath='{range .items[*].spec}{@.scaleTargetRef.name}:{@.targetCPUUtilizationPercentage}:{@.minReplicas}:{@.maxReplicas}{end}')
+    exp_autoscale="${func}:${val}:${num}:${num}"
+    [[ ${act_autoscale} == ${exp_autoscale} ]]
     k8s_wait_for_pod_count ${num} -l function="${func}"
     kubeless autoscale delete ${func}
 }
