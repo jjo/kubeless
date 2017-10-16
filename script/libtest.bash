@@ -48,15 +48,19 @@ k8s_wait_for_pod_ready() {
         sleep 1
     done
 }
-k8s_wait_for_uniq_pod() {
-    echo_info "Waiting for pod '${@}' to be the only one running ... "
+k8s_wait_for_pod_count() {
+    local pod_cnt=${1:?}; shift
+    echo_info "Waiting for pod '${@}' to have count==${pod_cnt} running ... "
     local -i cnt=${TEST_MAX_WAIT_SEC:?}
-    until [[ $(kubectl get pod "${@}" -ogo-template='{{.items|len}}') == 1 ]]; do
+    until [[ $(kubectl get pod "${@}" -ogo-template='{{.items|len}}') == ${pod_cnt} ]]; do
         ((cnt=cnt-1)) || return 1
         sleep 1
     done
     k8s_wait_for_pod_ready "${@}"
     echo "Finished waiting"
+}
+k8s_wait_for_uniq_pod() {
+    k8s_wait_for_pod_count 1 "$@"
 }
 k8s_wait_for_pod_gone() {
     echo_info "Waiting for pod '${@}' to be gone ... "
@@ -287,7 +291,14 @@ test_kubeless_function_update() {
 test_kubeless_ingress() {
     local func=${1:?}
     kubeless ingress create ing-${func} --function ${func} --hostname ${func}.example.com
-    kubeless ingress list | fgrep ing-${func}
+    kubeless ingress list | fgrep -w ing-${func}
     kubeless ingress delete ing-${func}
+}
+test_kubeless_autoscale() {
+    local func=${1:?} val=${2:?} num=${3:?}
+    kubeless autoscale create ${func} --value ${val} --min ${num} --max ${num}
+    kubeless autoscale list | fgrep -w ${func}
+    k8s_wait_for_pod_count ${num} -l function="${func}"
+    kubeless autoscale delete ${func}
 }
 # vim: sw=4 ts=4 et si
