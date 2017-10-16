@@ -284,4 +284,10 @@ test_kubeless_function_update() {
     update_function $func
     verify_update_function $func
 }
+test_kubeless_ingress() {
+    local func=${1:?}
+    kubeless ingress create ing-${func} --function ${func} --hostname ${func}.example.com
+    kubeless ingress list | fgrep ing-${func}
+    kubeless ingress delete ing-${func}
+}
 # vim: sw=4 ts=4 et si
