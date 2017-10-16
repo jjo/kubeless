@@ -295,8 +295,10 @@ test_kubeless_ingress() {
     kubeless ingress delete ing-${func}
 }
 test_kubeless_autoscale() {
-    local func=${1:?} val=${2:?} num=${3:?}
-    kubeless autoscale create ${func} --value ${val} --min ${num} --max ${num}
+    local func=${1:?} 
+    # Use some fixed values
+    local val=10 num=3
+    kubeless autoscale create ${func} --value ${val:?} --min ${num:?} --max ${num:?}
     kubeless autoscale list | fgrep -w ${func}
     k8s_wait_for_pod_count ${num} -l function="${func}"
     kubeless autoscale delete ${func}
