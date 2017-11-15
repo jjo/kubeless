@@ -325,11 +325,11 @@ test_topic_deletion() {
     fi
 }
 sts_restart() {
-    kubectl delete pod kafka-0 -n kubeless
     kubectl delete pod zoo-0 -n kubeless
     k8s_wait_for_uniq_pod -l kubeless=zookeeper -n kubeless
-    k8s_wait_for_uniq_pod -l kubeless=kafka -n kubeless
     k8s_wait_for_pod_ready -l kubeless=zookeeper -n kubeless
+    kubectl delete pod kafka-0 -n kubeless
+    k8s_wait_for_uniq_pod -l kubeless=kafka -n kubeless
     k8s_wait_for_pod_ready -l kubeless=kafka -n kubeless
 }
 # vim: sw=4 ts=4 et si
