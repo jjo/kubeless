@@ -160,12 +160,16 @@ _wait_for_kubeless_kafka_server_ready() {
     local test_topic=test-centinel
     echo_info "Waiting for kafka-0 to be ready ..."
     k8s_wait_for_pod_logline "Kafka.*Server.*started" -n kubeless kafka-0
-    sleep 10
     kubeless topic list | grep -qw "${test_topic}" || {
         kubeless topic create "${test_topic}" || true
         _wait_for_kubeless_kafka_topic_ready "${test_topic}"
     }
     kubectl annotate pods --overwrite -n kubeless kafka-0 ready=true
+}
+_kafka_get_topics() {
+    kubectl exec -n kubeless kafka-0 -- sh -c \
+    '/opt/bitnami/kafka/bin/kafka-topics.sh --list --zookeeper $(
+        sed -n s/zookeeper.connect=//p /bitnami/kafka/conf/server.properties)'
 }
 _wait_for_kubeless_kafka_topic_ready() {
     local topic=${1:?}
@@ -173,11 +177,10 @@ _wait_for_kubeless_kafka_topic_ready() {
     echo_info "Waiting for kafka-0 topic='${topic}' to be ready ..."
     # zomg enter kafka-0 container to peek for topic already present
     until \
-        kubectl exec -n kubeless kafka-0 -- sh -c \
-        '/opt/bitnami/kafka/bin/kafka-topics.sh --list --zookeeper $(
-            sed -n s/zookeeper.connect=//p /bitnami/kafka/conf/server.properties)'| \
-                grep -qw ${topic}
+        _kafka_get_topics | grep -qw ${topic}
         do
+        echo_info "DEBUG: kafka-0 topics:"
+        _kafka_get_topics
         ((cnt=cnt-1)) || return 1
         sleep 1
     done
