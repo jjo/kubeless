@@ -174,4 +174,6 @@ pubsub-python-sts:
 pubsub-python-sts-verify:
 	$(eval DATA := $(shell mktemp -u -p entry -t XXXXXXXX))
 	kubeless topic publish --topic s3-python-sts --data "$(DATA)"
+	sleep 20
+	bash -c 'kubectl logs $$(kubectl get po -oname|grep pubsub-python-sts) >&9'
 	bash -c 'grep -q "$(DATA)" <(timeout 60 kubectl logs -f $$(kubectl get po -oname|grep pubsub-python-sts))'
