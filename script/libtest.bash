@@ -179,8 +179,7 @@ _wait_for_kubeless_kafka_topic_ready() {
     until \
         _kafka_get_topics | grep -qw ${topic}
         do
-        echo_info "DEBUG: kafka-0 topics:"
-        _kafka_get_topics
+        echo_info "DEBUG: kafka-0 topics: $(_kafka_get_topics|paste -s)"
         ((cnt=cnt-1)) || return 1
         sleep 1
     done
