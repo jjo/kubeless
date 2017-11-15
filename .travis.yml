@@ -41,6 +41,7 @@ script:
 after_success:
   - |
     if [[ "$TRAVIS_BRANCH" == master && \
+          "$TRAVIS_REPO_SLUG" == "kubeless/kubeless" && \
           "$TRAVIS_PULL_REQUEST" == false ]]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       docker tag $CONTROLLER_IMAGE ${CONTROLLER_IMAGE_NAME}:latest
